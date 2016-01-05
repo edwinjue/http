@@ -1,4 +1,23 @@
 require 'socket'
+
+def timestamp(client)
+time = Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')
+puts "Sending response."
+response = "<pre>" + time + "</pre>"
+output = "<html><head></head><body>#{response}</body></html>"
+headers = ["http/1.1 200 ok",
+          "date: #{time}",
+          "server: ruby",
+          "content-type: text/html; charset=iso-8859-1",
+          "content-length: #{output.length}\r\n\r\n"].join("\r\n")
+client.puts headers
+client.puts output
+
+puts ["Wrote this response:", headers, output].join("\n")
+end
+
+
+
 tcp_server = TCPServer.new(9292)
 client = tcp_server.accept
 
@@ -33,6 +52,7 @@ case d['Path']
 		puts '/hello detected'
 	when '/datetime'
 		puts '/datetime detected'
+		timestamp(client)
 	when '/shutdown'
 		puts '/shutdown detected'
 	else
@@ -48,11 +68,12 @@ d.each{|key,val|
 client.close
 
 =begin
+time = Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')
 puts "Sending response."
-response = "<pre>" + request_lines.join("\n") + "</pre>"
+response = "<pre>" + time + "</pre>"
 output = "<html><head></head><body>#{response}</body></html>"
 headers = ["http/1.1 200 ok",
-          "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
+          "date: #{time}",
           "server: ruby",
           "content-type: text/html; charset=iso-8859-1",
           "content-length: #{output.length}\r\n\r\n"].join("\r\n")
@@ -60,6 +81,4 @@ client.puts headers
 client.puts output
 
 puts ["Wrote this response:", headers, output].join("\n")
-client.close
-puts "\nResponse complete, exiting."
 =end
