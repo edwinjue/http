@@ -1,9 +1,9 @@
 require 'socket'
 
-def timestamp(client)
+def response(client,msg)
 time = Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')
 puts "Sending response."
-response = "<pre>" + time + "</pre>"
+response = "<pre>" + msg.to_s + "</pre>"
 output = "<html><head></head><body>#{response}</body></html>"
 headers = ["http/1.1 200 ok",
           "date: #{time}",
@@ -18,9 +18,11 @@ end
 
 
 
+
 tcp_server = TCPServer.new(9292)
 client = tcp_server.accept
 
+loop do
 puts "Ready for a request"
 request_lines = []
 while line = client.gets and !line.chomp.empty?
@@ -48,15 +50,19 @@ request_lines.each.with_index{ |req,index|
 case d['Path']
 	when '/'
 		puts '/ detected'
+		response(client,'/ detected')
 	when '/hello'
 		puts '/hello detected'
+		response(client, '/hello detected')
 	when '/datetime'
 		puts '/datetime detected'
-		timestamp(client)
+		response(client, Time.now.strftime('%a, %e %b %Y %H:%M:%S %z'))
 	when '/shutdown'
 		puts '/shutdown detected'
+		response(client, '/shutdown detected')
 	else
 		puts "#{d['Path']} is an unknown command"
+		response(client, "/unknown command, #{d['Path']} detected")
 end
 
 #output diagnostic info
@@ -65,6 +71,8 @@ d.each{|key,val|
 	puts "#{key}: #{val}"
 }
 
+
+end
 client.close
 
 =begin
