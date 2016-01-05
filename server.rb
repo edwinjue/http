@@ -1,11 +1,20 @@
 require 'socket'
 
-def response(client,msg)
+#Constants
+STATUS_OK = '200 OK'
+STATUS_MOVED = '301 Moved Permanently'
+STATUS_UNAUTH = '401 Unauthorized'
+STATUS_FORB = '403 Forbidden'
+STATUS_NOTFOUND = '404 Not Found'
+STATUS_ERROR = '500 Internal Server Error'
+
+
+def response(client,msg,status=STATUS_OK)
 time = Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')
 puts "Sending response."
 response = "<pre>" + msg.to_s + "</pre>"
 output = "<html><head></head><body>#{response}</body></html>"
-headers = ["http/1.1 200 ok",
+headers = ["http/1.1 #{status}",
           "date: #{time}",
           "server: ruby",
           "content-type: text/html; charset=iso-8859-1",
@@ -62,7 +71,7 @@ case d['Path']
 		response(client, '/shutdown detected')
 	else
 		puts "#{d['Path']} is an unknown command"
-		response(client, "/unknown command, #{d['Path']} detected")
+		response(client, "unknown command, #{d['Path']} detected",STATUS_NOTFOUND)
 end
 
 #output diagnostic info
