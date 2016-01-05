@@ -8,7 +8,7 @@ STATUS_FORB = '403 Forbidden'
 STATUS_NOTFOUND = '404 Not Found'
 STATUS_ERROR = '500 Internal Server Error'
 
-
+#Helper methods
 def response(client,msg,status=STATUS_OK)
 time = Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')
 puts "Sending response."
@@ -25,11 +25,10 @@ client.puts output
 puts ["Wrote this response:", headers, output].join("\n")
 end
 
-
-
-
+#Main code
 tcp_server = TCPServer.new(9292)
 client = tcp_server.accept
+counter = 0
 
 loop do
 puts "Ready for a request"
@@ -37,6 +36,8 @@ request_lines = []
 while line = client.gets and !line.chomp.empty?
   request_lines << line.chomp
 end
+
+counter += 1
 
 puts "Got this request:"
 puts request_lines.inspect
@@ -62,7 +63,8 @@ case d['Path']
 		response(client,'/ detected')
 	when '/hello'
 		puts '/hello detected'
-		response(client, '/hello detected')
+		#response(client, '/hello detected')
+		response(client, "Hello World #{counter}")
 	when '/datetime'
 		puts '/datetime detected'
 		response(client, Time.now.strftime('%a, %e %b %Y %H:%M:%S %z'))
