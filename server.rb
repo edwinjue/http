@@ -23,17 +23,18 @@ def response(client,msg,status=STATUS_OK)
     client.puts output
 
     puts ["Wrote this response:", headers, output].join("\n")
+    client.close
   end
 
 #Initialize variables
 tcp_server = TCPServer.new(9292)
-client = tcp_server.accept
 counter = 0 #to track total number of requests
 hello = 0 #to track total number of requests to /hello
 d = {}  #hash containing request diagnostic info
 
 #Main code
 loop do
+  client = tcp_server.accept
   puts "Ready for a request"
   request_lines = []
   while line = client.gets and !line.chomp.empty?
@@ -72,7 +73,6 @@ loop do
     when '/shutdown'
       puts '/shutdown detected'
       response(client, "/shutdown detected, total number of requests = #{counter}")
-      client.close
       exit
     else
       puts "#{d['Path']} is an unknown command"
@@ -87,4 +87,4 @@ loop do
 
 
 end
-client.close
+#client.close
