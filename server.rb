@@ -25,21 +25,23 @@ def response(client,msg,status=STATUS_OK)
     puts ["Wrote this response:", headers, output].join("\n")
   end
 
-#Main code
+#Initialize variables
 tcp_server = TCPServer.new(9292)
 client = tcp_server.accept
-counter = 0
+counter = 0 #to track total number of requests
+hello = 0 #to track total number of requests to /hello
+d = {}  #hash containing request diagnostic info
 
+#Main code
 loop do
-  counter += 1
-  d = {}  #hash containing request diagnostic info
-
   puts "Ready for a request"
   request_lines = []
   while line = client.gets and !line.chomp.empty?
     request_lines << line.chomp
   end
-
+  
+  counter += 1
+  
   puts "Got this request:"
   puts request_lines.inspect
   print "\n"
@@ -57,19 +59,19 @@ loop do
 
   #process request
   case d['Path']
-  when '/'
-    puts '/ detected'
-    response(client,'/ detected')
-  when '/hello'
-    puts '/hello detected'
-      #response(client, '/hello detected')
+    when '/'
+      puts '/ detected'
+      response(client,'/ detected')
+    when '/hello'
+      puts '/hello detected'
+      hello += 1
       response(client, "Hello World #{counter}")
     when '/datetime'
       puts '/datetime detected'
       response(client, Time.now.strftime('%a, %e %b %Y %H:%M:%S %z'))
     when '/shutdown'
       puts '/shutdown detected'
-      response(client, '/shutdown detected')
+      response(client, "/shutdown detected, total number of requests = #{counter}")
       client.close
       exit
     else
