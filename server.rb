@@ -65,7 +65,7 @@ loop do
     when '/hello'
       puts '/hello detected'
       hello += 1
-      response(client, "Hello World #{counter}")
+      response(client, "Hello World #{hello}")
     when '/datetime'
       puts '/datetime detected'
       response(client, Time.now.strftime('%a, %e %b %Y %H:%M:%S %z'))
