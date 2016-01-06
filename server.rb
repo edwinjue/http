@@ -61,7 +61,7 @@ loop do
   case d['Path']
     when '/'
       puts '/ detected'
-      response(client,'/ detected')
+      response(client,d.collect{ |k,v| "#{k}: #{v}" }.join("\n"))
     when '/hello'
       puts '/hello detected'
       hello += 1
